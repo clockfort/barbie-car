@@ -47,14 +47,7 @@ void setup(){
 
 void loop(){
   serial_json_log();
-  
-  //Needs to fit nicely under "MPH  ETEMP BTEMP" line
-  lcd.setCursor(0,1);
-  lcd.print(speed_average, 4);
-  lcd.setCursor(5,1);
-  lcd.print(thermistor(pin_thermistor1), 4);
-  lcd.setCursor(11,1);
-  lcd.print("0.000"); //todo: add another thermistor
+  lcd_update();
   
   delay(1000); //todo: increase speed after done debugging
 }
@@ -67,13 +60,22 @@ void serial_json_log(){
   Serial.println(" }");
 }
 
+void lcd_update(){
+  //Needs to fit nicely under "MPH  ETEMP BTEMP" line
+  lcd.setCursor(0,1);
+  lcd.print(speed_average, 4);
+  lcd.setCursor(5,1);
+  lcd.print(thermistor(pin_thermistor1), 4);
+  lcd.setCursor(11,1);
+  lcd.print("0.000"); //todo: add another thermistor
+}
+
 float thermistor(int pin){
     float resistance = 500.0/(1023.0/analogRead(pin) - 1);
     
     //pretty sure beta coefficient (3468) is wrong for my device, I need to grab some equipment to calculate it
     float steinhart_output = 1.0/(log(resistance/500.0)/3468 + (1.0 / (25.0+273.15)));
     float fahrenheit = (steinhart_output - 273.15) * 1.8 + 32.0;
-    
     
     return fahrenheit;
 }
@@ -83,12 +85,12 @@ void speed_isr(){
   speed = 1.0/((tick - tock) * edges_per_revolution / microseconds_per_hour * revolutions_per_mile);
   
   if(++ticks > ticks_per_update){
-     ticks=1;
-     speed_average = speed_internal_average/ticks_per_update;
-     speed_internal_average=speed;
+    ticks=1;
+    speed_average = speed_internal_average/ticks_per_update;
+    speed_internal_average=speed;
   }
   else{
-   speed_internal_average+=speed;
+    speed_internal_average+=speed;
   }
   
   tock = tick;
@@ -100,7 +102,7 @@ void wiper_isr(){
     wiper.write(position);
   }
   else{
-   direction*=-1;
-   position+=direction; 
+    direction*=-1;
+    position+=direction; 
   }
 }
