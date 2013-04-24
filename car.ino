@@ -1,6 +1,6 @@
 #include "PITimer.h"
 #include <Servo.h>
-
+#include <LiquidCrystal.h>
 
 //speed calculation variables/constants
 volatile unsigned long tick=0,tock=0;
@@ -20,9 +20,24 @@ volatile int direction = 1;
 #define pin_thermistor1 0 //must be pin w/ ADC capability
 #define pin_encoder 1 //must be pin w/external interrupt capability
 #define pin_servo 2 //might need PWM pin
+#define pin_lcd_rs 3
+#define pin_lcd_en 4
+#define pin_lcd_d4 8
+#define pin_lcd_d5 7
+#define pin_lcd_d6 6
+#define pin_lcd_d7 5
+
+LiquidCrystal lcd(pin_lcd_rs, pin_lcd_en, pin_lcd_d4, pin_lcd_d5, pin_lcd_d6, pin_lcd_d7);
 
 void setup(){
   Serial.begin(9600);
+  
+  lcd.begin(16, 2);
+  lcd.print("BarbieOS Booting");
+  delay(1000); //So we can enjoy the load message.
+  lcd.setCursor(0,0);
+  lcd.print("MPH  ETEMP BTEMP");
+  
   attachInterrupt(pin_encoder, speed_isr, RISING); // both edges would be a 40KHz signal @ 20mph @ 9inch diameter tires (16 edges per revolution)
 
   wiper.attach(pin_servo);
@@ -31,16 +46,22 @@ void setup(){
 }
 
 void loop(){
-  Serial.print("Sensor 1 Temperature = ");
+  Serial.print("E-temp=");
   Serial.print(thermistor(pin_thermistor1));
-  Serial.println(" F ");
-
-  Serial.print("MPH = ");
+  Serial.print(" F");
+  Serial.print("   MPH=");
   Serial.println(speed_average);
   
-  delay(1000);
+  //Needs to fit nicely under "MPH  ETEMP BTEMP" line
+  lcd.setCursor(0,1);
+  lcd.print(speed_average, 4);
+  lcd.setCursor(5,1);
+  lcd.print(thermistor(pin_thermistor1), 4);
+  lcd.setCursor(11,1);
+  lcd.print("0.000"); //todo: add another thermistor
+  
+  delay(1000); //todo: increase speed after done debugging
 }
-
 
 float thermistor(int pin){
     float resistance = 500.0/(1023.0/analogRead(pin) - 1);

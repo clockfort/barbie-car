@@ -6,4 +6,4 @@ Currently capabilities:
 * Speedometer
 * Engine temperature
 * Windshield Wipers
-* (Eventually) LCD module to display status to the driver
+* LCD module to display status to the driver
