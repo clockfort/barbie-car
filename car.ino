@@ -26,8 +26,8 @@ void setup(){
   attachInterrupt(pin_encoder, speed_isr, RISING); // both edges would be a 40KHz signal @ 20mph @ 9inch diameter tires (16 edges per revolution)
 
   wiper.attach(pin_servo);
-  PITimer1.period(0.015);
-  PITimer1.start(update_wipers);
+  PITimer1.period(0.015); // 15ms
+  PITimer1.start(wiper_isr);
 }
 
 void loop(){
@@ -69,7 +69,7 @@ void speed_isr(){
   tock = tick;
 }
 
-void update_wipers(){
+void wiper_isr(){
   if(position < 90 && position > 0){
     position+=direction;
     wiper.write(position);
