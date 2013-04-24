@@ -6,8 +6,9 @@ volatile unsigned int ticks;
 #define microseconds_per_hour 3600000000.0
 #define ticks_per_update 10000
 
-#define pin_thermistor1 = 0; //must be pin w/ ADC capability
-#define pin_encoder = 1; //must be pin w/external interrupt capability
+#define pin_thermistor1 0 //must be pin w/ ADC capability
+#define pin_encoder 1 //must be pin w/external interrupt capability
+
 
 void setup(){
   Serial.begin(9600);
