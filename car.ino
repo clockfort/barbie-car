@@ -71,11 +71,9 @@ void lcd_update(){
 }
 
 float thermistor(int pin){
-    float resistance = 500.0/(1023.0/analogRead(pin) - 1);
+    double resistance = 500.0/(1023.0/analogRead(pin) - 1);
     
-    //pretty sure beta coefficient (3468) is wrong for my device, I need to grab some equipment to calculate it
-    float steinhart_output = 1.0/(log(resistance/500.0)/3468 + (1.0 / (25.0+273.15)));
-    float fahrenheit = (steinhart_output - 273.15) * 1.8 + 32.0;
+    double fahrenheit = ((2463.5629786462*resistance^-0.7376203914) - 273.15) * 1.8 + 32.0;
     
     return fahrenheit;
 }
