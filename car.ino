@@ -1,3 +1,8 @@
+#include "PITimer.h"
+#include <Servo.h>
+
+
+//speed calculation variables/constants
 volatile unsigned long tick=0,tock=0;
 volatile double speed = 0, speed_average = 0, speed_internal_average = 0;
 volatile unsigned int ticks;
@@ -6,13 +11,23 @@ volatile unsigned int ticks;
 #define microseconds_per_hour 3600000000.0
 #define ticks_per_update 10000
 
+//windshield wiper variables/constants
+Servo wiper;
+volatile int position = 0;
+volatile int direction = 1;
+
+//pins
 #define pin_thermistor1 0 //must be pin w/ ADC capability
 #define pin_encoder 1 //must be pin w/external interrupt capability
-
+#define pin_servo 2 //might need PWM pin
 
 void setup(){
   Serial.begin(9600);
   attachInterrupt(pin_encoder, speed_isr, RISING); // both edges would be a 40KHz signal @ 20mph @ 9inch diameter tires (16 edges per revolution)
+
+  wiper.attach(pin_servo);
+  PITimer1.period(0.015);
+  PITimer1.start(update_wipers);
 }
 
 void loop(){
@@ -52,4 +67,15 @@ void speed_isr(){
   }
   
   tock = tick;
+}
+
+void update_wipers(){
+  if(position < 90 && position > 0){
+    position+=direction;
+    wiper.write(position);
+  }
+  else{
+   direction*=-1;
+   position+=direction; 
+  }
 }

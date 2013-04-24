@@ -1,0 +1,3 @@
+[submodule "PITimer"]
+	path = PITimer
+	url = git://github.com/loglow/PITimer.git
