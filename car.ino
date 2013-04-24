@@ -46,11 +46,7 @@ void setup(){
 }
 
 void loop(){
-  Serial.print("E-temp=");
-  Serial.print(thermistor(pin_thermistor1));
-  Serial.print(" F");
-  Serial.print("   MPH=");
-  Serial.println(speed_average);
+  serial_json_log();
   
   //Needs to fit nicely under "MPH  ETEMP BTEMP" line
   lcd.setCursor(0,1);
@@ -61,6 +57,14 @@ void loop(){
   lcd.print("0.000"); //todo: add another thermistor
   
   delay(1000); //todo: increase speed after done debugging
+}
+
+void serial_json_log(){
+  Serial.print("{\"engineTemp\": ");
+  Serial.print(thermistor(pin_thermistor1), 4);
+  Serial.print(", \"mph\": ");
+  Serial.print(speed_average, 4);
+  Serial.println(" }");
 }
 
 float thermistor(int pin){
